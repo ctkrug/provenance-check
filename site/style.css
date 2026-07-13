@@ -1,0 +1,95 @@
+/* Provenance Check — exhibit-binder direction. Tokens mirror docs/DESIGN.md. */
+
+:root {
+  --bg: #f4efe2;
+  --surface-1: #fbf8f0;
+  --surface-2: #eae1cc;
+  --text: #2a241c;
+  --text-muted: #6e6353;
+  --accent: #1f3a5f;
+  --accent-support: #a9812e;
+  --success: #2f6b4f;
+  --warning: #b8842c;
+  --danger: #b23a2e;
+
+  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-ui: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+  --step--1: 0.8rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.563rem;
+  --step-3: 1.953rem;
+  --step-4: 2.441rem;
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-6: 48px;
+  --space-8: 64px;
+
+  --radius: 3px;
+  --shadow-paper: 0 1px 2px rgba(42, 36, 28, 0.08), 0 4px 12px rgba(42, 36, 28, 0.1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  background-image: radial-gradient(circle at 15% 0%, rgba(169, 129, 46, 0.08), transparent 45%),
+    radial-gradient(circle at 85% 100%, rgba(31, 58, 95, 0.06), transparent 50%);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--step-0);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.wordmark__text {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+}
+
+::selection {
+  background: var(--accent-support);
+  color: var(--surface-1);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
