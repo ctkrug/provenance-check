@@ -490,7 +490,7 @@ a {
 .stamp__label {
   font-family: var(--font-ui);
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
   fill: currentColor;
   text-anchor: middle;
 }
