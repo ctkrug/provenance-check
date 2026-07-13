@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ctkrug/provenance-check/internal/provenance"
 )
@@ -25,16 +26,28 @@ func main() {
 	}
 
 	exitCode := 0
-	for _, url := range urls {
-		result, err := provenance.Check(url)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "provenance-check: %s: %v\n", url, err)
+	for _, r := range provenance.BatchCheck(urls) {
+		if r.Err != nil {
+			fmt.Fprintf(os.Stderr, "provenance-check: %s: %v\n", r.Result.URL, r.Err)
 			exitCode = 1
 			continue
 		}
-		fmt.Printf("%-8s %s\n", result.Verdict, result.URL)
+		printResult(r.Result)
+		if r.Result.Verdict == provenance.VerdictRestricted {
+			exitCode = 1
+		}
 	}
 	os.Exit(exitCode)
+}
+
+// printResult renders one line per URL with its badge and SPDX license,
+// followed by an indented line quoting the flagged clause and its source
+// file for any non-clear verdict.
+func printResult(r provenance.Result) {
+	fmt.Printf("%-10s %-16s %s\n", strings.ToUpper(string(r.Verdict)), r.License, r.URL)
+	if r.Clause != "" {
+		fmt.Printf("           clause: %q (%s)\n", r.Clause, r.Source)
+	}
 }
 
 func readURLsFromStdin() []string {
@@ -56,5 +69,8 @@ func printUsage() {
 	fmt.Fprintln(os.Stderr, "usage: provenance-check <url> [<url> ...]")
 	fmt.Fprintln(os.Stderr, "       cat urls.txt | provenance-check")
 	fmt.Fprintln(os.Stderr)
-	fmt.Fprintln(os.Stderr, "Flags a dataset or repo license for AI/ML training restrictions.")
+	fmt.Fprintln(os.Stderr, "Flags a GitHub repo or Hugging Face dataset/model license for AI/ML")
+	fmt.Fprintln(os.Stderr, "training restrictions. URLs are checked concurrently.")
+	fmt.Fprintln(os.Stderr)
+	fmt.Fprintln(os.Stderr, "Exits non-zero if any URL is restricted or fails to resolve.")
 }
