@@ -188,6 +188,7 @@ async function runBatch(urls) {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  const lineCount = urlsField.value.split("\n").filter((line) => line.trim().length > 0).length;
   const urls = parseURLs(urlsField.value);
   if (urls.length === 0) {
     statusLine.textContent = "Paste at least one URL first.";
@@ -198,6 +199,9 @@ form.addEventListener("submit", async (event) => {
   urlsField.readOnly = true;
   try {
     await runBatch(urls);
+    if (lineCount > MAX_URLS) {
+      statusLine.textContent += ` (first ${MAX_URLS} of ${lineCount} pasted — trim the list to check the rest)`;
+    }
   } finally {
     checkButton.disabled = false;
     urlsField.readOnly = false;
