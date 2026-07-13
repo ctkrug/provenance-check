@@ -383,6 +383,22 @@ a {
   box-shadow: 0 2px 4px rgba(42, 36, 28, 0.1), 0 8px 20px rgba(42, 36, 28, 0.12);
 }
 
+.exhibit-card--clear {
+  border-left: 3px solid var(--success);
+}
+
+.exhibit-card--caution {
+  border-left: 3px solid var(--warning);
+}
+
+.exhibit-card--restricted {
+  border-left: 3px solid var(--danger);
+}
+
+.exhibit-card--error {
+  border-left: 3px solid var(--text-muted);
+}
+
 .exhibit-card__head {
   display: flex;
   align-items: flex-start;

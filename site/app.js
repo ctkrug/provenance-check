@@ -82,3 +82,132 @@ function stampSVG(verdict, { loading = false } = {}) {
   `;
 }
 
+const grid = document.getElementById("exhibit-grid");
+const emptyState = document.getElementById("empty-state");
+const cardTemplate = document.getElementById("exhibit-card-template");
+
+// createCard clones the <template> for one URL, in its loading state, and
+// appends it to the grid. Returns the new card element so the caller can
+// update it in place once the check resolves.
+function createCard(url, index) {
+  const fragment = cardTemplate.content.cloneNode(true);
+  const card = fragment.querySelector(".exhibit-card");
+  card.dataset.url = url;
+  card.querySelector(".exhibit-card__index").textContent =
+    "Exhibit " + String(index + 1).padStart(2, "0");
+  card.querySelector(".exhibit-card__stamp-slot").innerHTML = stampSVG(null, { loading: true });
+  card.querySelector(".exhibit-card__url").textContent = url;
+  grid.appendChild(card);
+  return card;
+}
+
+// resolveCard updates a loading card in place with its settled verdict —
+// no layout jump, just the shimmer and pulsing stamp replaced by the real
+// result and a stamp "hit" flourish.
+function resolveCard(card, payload) {
+  card.classList.remove("exhibit-card--loading");
+  card.classList.add("exhibit-card--" + payload.verdict);
+
+  const stampSlot = card.querySelector(".exhibit-card__stamp-slot");
+  stampSlot.innerHTML = stampSVG(payload.verdict);
+  const stampEl = stampSlot.querySelector(".stamp");
+  stampEl.classList.add("stamp--hit");
+
+  const licenseEl = card.querySelector(".exhibit-card__license");
+  const toggle = card.querySelector(".exhibit-card__toggle");
+  const clauseSection = card.querySelector(".exhibit-card__clause");
+
+  if (payload.verdict === "error") {
+    licenseEl.textContent = "unavailable";
+    toggle.hidden = false;
+    toggle.textContent = "View error";
+    clauseSection.querySelector(".exhibit-card__clause-source").textContent = "Fetch failed";
+    clauseSection.querySelector(".exhibit-card__clause-text").textContent = payload.error;
+    return;
+  }
+
+  licenseEl.textContent = payload.license || "unknown";
+
+  if (payload.clause) {
+    toggle.hidden = false;
+    toggle.textContent = "View clause";
+    clauseSection.querySelector(".exhibit-card__clause-source").textContent =
+      "Source: " + (payload.source || "unknown");
+    clauseSection.querySelector(".exhibit-card__clause-text").textContent = payload.clause;
+  }
+}
+
+function setToggleHandler(card) {
+  const toggle = card.querySelector(".exhibit-card__toggle");
+  const clauseSection = card.querySelector(".exhibit-card__clause");
+  toggle.addEventListener("click", () => {
+    const expanded = toggle.getAttribute("aria-expanded") === "true";
+    toggle.setAttribute("aria-expanded", String(!expanded));
+    clauseSection.hidden = expanded;
+  });
+}
+
+const form = document.getElementById("check-form");
+const urlsField = document.getElementById("urls");
+const clearButton = document.getElementById("clear-button");
+
+function resetGrid() {
+  grid.innerHTML = "";
+  grid.appendChild(emptyState);
+}
+
+async function runBatch(urls) {
+  grid.innerHTML = "";
+  let resolved = 0;
+  statusLine.textContent = `0 of ${urls.length} resolved`;
+
+  const cards = urls.map((url, index) => {
+    const card = createCard(url, index);
+    setToggleHandler(card);
+    return card;
+  });
+
+  await Promise.all(
+    urls.map(async (url, index) => {
+      const payload = await window.provenanceCheck(url);
+      resolveCard(cards[index], payload);
+      resolved += 1;
+      statusLine.textContent = `${resolved} of ${urls.length} resolved`;
+    })
+  );
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const urls = parseURLs(urlsField.value);
+  if (urls.length === 0) {
+    statusLine.textContent = "Paste at least one URL first.";
+    return;
+  }
+
+  checkButton.disabled = true;
+  urlsField.readOnly = true;
+  try {
+    await runBatch(urls);
+  } finally {
+    checkButton.disabled = false;
+    urlsField.readOnly = false;
+  }
+});
+
+clearButton.addEventListener("click", () => {
+  urlsField.value = "";
+  urlsField.focus();
+  resetGrid();
+  statusLine.textContent = "";
+});
+
+const collapseToggle = document.getElementById("collapse-toggle");
+const panelBody = document.getElementById("panel-body");
+
+collapseToggle.addEventListener("click", () => {
+  const expanded = collapseToggle.getAttribute("aria-expanded") === "true";
+  collapseToggle.setAttribute("aria-expanded", String(!expanded));
+  panelBody.hidden = expanded;
+});
+
