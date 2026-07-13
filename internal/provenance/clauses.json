@@ -1,0 +1,44 @@
+[
+  {
+    "id": "explicit-no-ml-training",
+    "verdict": "restricted",
+    "pattern": "(?i)(this (?:dataset|software|model|repository|code)[^.]*(?:may not|must not|shall not|is not to)[^.]*be used[^.]*(?:to train|for training)[^.]*machine learning[^.]*\\.)",
+    "description": "Explicit clause prohibiting use of this dataset/software to train machine learning models."
+  },
+  {
+    "id": "no-ai-training-addendum",
+    "verdict": "restricted",
+    "pattern": "(?i)(not permitted to use this (?:dataset|repository|software|content)[^.]*for[^.]*(?:ai|artificial intelligence)[^.]*training[^.]*\\.)",
+    "description": "Ad-hoc addendum forbidding use of the content for AI training purposes."
+  },
+  {
+    "id": "no-training-data-for-generative-models",
+    "verdict": "restricted",
+    "pattern": "(?i)(may not be used[^.]*as training data[^.]*for[^.]*generative[^.]*model[^.]*\\.)",
+    "description": "Explicit prohibition on use as training data for generative models."
+  },
+  {
+    "id": "openrail-use-restrictions",
+    "verdict": "restricted",
+    "pattern": "(?i)(you agree not to use the model or derivatives of the model[^.]*\\.)",
+    "description": "OpenRAIL-style behavioral use restriction on the model and its derivatives."
+  },
+  {
+    "id": "responsible-ai-license-restricted-uses",
+    "verdict": "restricted",
+    "pattern": "(?i)(this license (?:includes|contains|imposes)[^.]*restrictions? on use[^.]*section[^.]*restricted uses[^.]*\\.)",
+    "description": "Responsible AI License (RAIL) style reference to a restricted-uses section."
+  },
+  {
+    "id": "no-commercial-ml-use",
+    "verdict": "caution",
+    "pattern": "(?i)(not (?:intended|licensed) for commercial (?:use|ml use|machine learning use)[^.]*\\.)",
+    "description": "Ambiguous restriction on commercial use that may cover commercial ML training."
+  },
+  {
+    "id": "research-only-use",
+    "verdict": "caution",
+    "pattern": "(?i)(licensed for (?:research|academic|non-commercial) (?:use|purposes) only[^.]*\\.)",
+    "description": "Research/academic-only grant, ambiguous for production ML training use."
+  }
+]
