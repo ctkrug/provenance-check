@@ -39,6 +39,22 @@ Paste GitHub and Hugging Face URLs (one per line). For each one, Provenance Chec
 - [ ] Exact clause + source file quoted for every non-green result (no black-box verdicts).
 - [ ] Batch mode: paste many URLs, get results incrementally instead of blocking on the slowest.
 
+## Usage
+
+```sh
+go build -o bin/provenance-check ./cmd/provenance-check
+
+./bin/provenance-check \
+  https://github.com/example/permissive-dataset \
+  https://huggingface.co/datasets/example/no-training-dataset
+
+# or pipe a list, one URL per line:
+cat urls.txt | ./bin/provenance-check
+```
+
+Each line of output is `<verdict> <url>`; verdicts and clause detail land as the
+classification engine is built out (see [`docs/BACKLOG.md`](docs/BACKLOG.md)).
+
 ## Stack
 
 Go (stdlib-first: `net/http`, no heavy framework). A static web front end talks to the same
