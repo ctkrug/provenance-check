@@ -169,7 +169,16 @@ async function runBatch(urls) {
 
   await Promise.all(
     urls.map(async (url, index) => {
-      const payload = await window.provenanceCheck(url);
+      let payload;
+      try {
+        payload = await window.provenanceCheck(url);
+      } catch (err) {
+        // provenanceCheck resolves fetch/parse failures as a normal
+        // {verdict: "error"} payload rather than rejecting, but a rejection
+        // here (e.g. an unexpected engine panic) must still resolve this
+        // one card instead of aborting every other in-flight check.
+        payload = { verdict: "error", error: err && err.message ? err.message : String(err) };
+      }
       resolveCard(cards[index], payload);
       resolved += 1;
       statusLine.textContent = `${resolved} of ${urls.length} resolved`;
