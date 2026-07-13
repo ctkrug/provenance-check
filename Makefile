@@ -20,7 +20,7 @@ run: build
 # js/wasm-only (see cmd/wasm/main.go's build tag), so it's built here
 # rather than folded into `build`, which targets the native CLI.
 wasm:
-	GOOS=js GOARCH=wasm go build -o site/dist/main.wasm ./cmd/wasm
+	GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o site/dist/main.wasm ./cmd/wasm
 
 # site assembles the self-contained static build: the wasm engine, the Go
 # runtime glue it needs, and the static HTML/CSS/JS shell. Every asset path
