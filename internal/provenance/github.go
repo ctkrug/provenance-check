@@ -57,7 +57,7 @@ func githubDefaultBranch(owner, repo string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("provenance: fetch github repo %s/%s: %w", owner, repo, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == http.StatusNotFound {
 		return "", fmt.Errorf("provenance: github repo %s/%s not found", owner, repo)
@@ -94,7 +94,7 @@ func httpGetOK(url string) (string, bool) {
 	if err != nil {
 		return "", false
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return "", false
 	}
