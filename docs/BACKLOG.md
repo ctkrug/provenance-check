@@ -52,34 +52,34 @@ anything optional gets built.
 
 ## Epic 3 — Web UI (exhibit grid)
 
-- [ ] **Paste-box input with batch submission.**
-  - [ ] The textarea accepts one URL per line; submitting with 1–50 URLs triggers a check per
+- [x] **Paste-box input with batch submission.**
+  - [x] The textarea accepts one URL per line; submitting with 1–50 URLs triggers a check per
     line, with blank lines ignored.
 
-- [ ] **Live-populating exhibit grid matching `docs/DESIGN.md`.**
-  - [ ] Each URL renders as a card showing a shimmer loading state immediately on submit, then
+- [x] **Live-populating exhibit grid matching `docs/DESIGN.md`.**
+  - [x] Each URL renders as a card showing a shimmer loading state immediately on submit, then
     updates in place (no layout jump) to its resolved verdict stamp within a couple of seconds.
-  - [ ] Grid, cards, and stamps use the tokens and layout defined in `docs/DESIGN.md` (parchment
+  - [x] Grid, cards, and stamps use the tokens and layout defined in `docs/DESIGN.md` (parchment
     palette, serif+mono type pairing, rotated stamp motif).
 
-- [ ] **Clause detail on non-green results.**
-  - [ ] Clicking/tapping a CAUTION or RESTRICTED card expands to show the exact quoted clause
+- [x] **Clause detail on non-green results.**
+  - [x] Clicking/tapping a CAUTION or RESTRICTED card expands to show the exact quoted clause
     text and which file it came from (LICENSE vs README/card).
 
-- [ ] **Responsive layout at 390 / 768 / 1440px.**
-  - [ ] No horizontal scroll and no overlapping elements at any of the three widths; the
+- [x] **Responsive layout at 390 / 768 / 1440px.**
+  - [x] No horizontal scroll and no overlapping elements at any of the three widths; the
     exhibit grid remains the majority of the viewport at desktop width.
 
-- [ ] **Design polish pass: interaction states, favicon, empty/error states.**
-  - [ ] Every interactive control (button, textarea, card) has themed hover/focus/active
+- [x] **Design polish pass: interaction states, favicon, empty/error states.**
+  - [x] Every interactive control (button, textarea, card) has themed hover/focus/active
     states — no unstyled native widgets.
-  - [ ] The favicon and empty-state illustration described in `docs/DESIGN.md` are implemented
+  - [x] The favicon and empty-state illustration described in `docs/DESIGN.md` are implemented
     (no default browser globe icon).
 
 ## Epic 4 — Ship & deploy
 
-- [ ] **Static build pipeline for the web UI.**
-  - [ ] A documented build command produces one self-contained directory (relative asset paths
+- [x] **Static build pipeline for the web UI.**
+  - [x] A documented build command produces one self-contained directory (relative asset paths
     only, no leading `/`) that renders and functions correctly when served from an arbitrary
     subpath.
 
@@ -88,5 +88,6 @@ anything optional gets built.
     resolver, and fails the build on any regression.
 
 - [ ] **README quickstart reflects the shipped CLI and web UI.**
-  - [ ] README's usage section matches the actual CLI flags/output and links to the deployed
-    web UI.
+  - [x] README's usage section matches the actual CLI flags/output.
+  - [ ] Links to the deployed web UI — pending CLOSEOUT's deploy to
+    `apps.charliekrug.com/provenance-check`.
