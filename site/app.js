@@ -25,7 +25,7 @@ async function loadEngine() {
   }
 }
 
-const engineReady = loadEngine()
+loadEngine()
   .then(() => {
     statusLine.textContent = "Engine ready.";
     checkButton.disabled = false;
