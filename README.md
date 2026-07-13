@@ -31,13 +31,14 @@ Paste GitHub and Hugging Face URLs (one per line). For each one, Provenance Chec
 
 ## Planned features
 
-- [ ] CLI: `provenance-check check <url> [<url> ...]` — prints a table to stdout.
+- [x] CLI: `provenance-check <url> [<url> ...]` — prints one line per URL, concurrently checked.
 - [ ] Web UI: paste a list, get live rows with badges as each URL resolves.
-- [ ] SPDX identifier detection from `LICENSE` / `LICENSE.md` / `package.json` / `pyproject.toml`.
-- [ ] Non-standard clause pattern library, versioned and reviewable independently of code.
-- [ ] Hugging Face dataset/model card parsing (YAML front matter + license field).
-- [ ] Exact clause + source file quoted for every non-green result (no black-box verdicts).
-- [ ] Batch mode: paste many URLs, get results incrementally instead of blocking on the slowest.
+- [x] SPDX identifier detection from `LICENSE` file text (MIT, Apache-2.0, BSD-2/3-Clause, ISC,
+      MPL-2.0, GPL-3.0, Unlicense, CC-BY-NC variants).
+- [x] Non-standard clause pattern library, versioned and reviewable independently of code.
+- [x] Hugging Face dataset/model card parsing (YAML front matter + license field).
+- [x] Exact clause + source file quoted for every non-green result (no black-box verdicts).
+- [x] Batch mode: every URL in a run is checked concurrently, isolated from its neighbors' errors.
 
 ## Usage
 
@@ -45,15 +46,27 @@ Paste GitHub and Hugging Face URLs (one per line). For each one, Provenance Chec
 go build -o bin/provenance-check ./cmd/provenance-check
 
 ./bin/provenance-check \
-  https://github.com/example/permissive-dataset \
+  https://github.com/expressjs/express \
+  https://huggingface.co/gpt2 \
   https://huggingface.co/datasets/example/no-training-dataset
 
 # or pipe a list, one URL per line:
 cat urls.txt | ./bin/provenance-check
 ```
 
-Each line of output is `<verdict> <url>`; verdicts and clause detail land as the
-classification engine is built out (see [`docs/BACKLOG.md`](docs/BACKLOG.md)).
+```
+CLEAR      MIT              https://github.com/expressjs/express
+CLEAR      MIT              https://huggingface.co/gpt2
+RESTRICTED unknown          https://huggingface.co/datasets/example/no-training-dataset
+           clause: "not permitted to use this dataset for AI training purposes." (README.md)
+```
+
+Each result line is `<verdict> <license> <url>`; a `RESTRICTED` or `CAUTION` result is
+followed by an indented line quoting the exact clause and which file it came from. The
+process exits non-zero if any URL is restricted or fails to resolve (unsupported host,
+unreachable repo, and similar). Only `github.com/<owner>/<repo>` and
+`huggingface.co/<org>/<model>` / `huggingface.co/datasets/<name>` URLs are supported today;
+anything else reports a clear "unsupported source" error instead of a crash or a silent skip.
 
 ## Stack
 
@@ -62,7 +75,9 @@ core parsing package the CLI uses, so the license-clause logic is never duplicat
 
 ## Status
 
-Early scaffold. See [`docs/VISION.md`](docs/VISION.md) for the full plan and
+The core engine is functional end-to-end: paste GitHub or Hugging Face URLs, get a verdict,
+license, and quoted clause via the CLI. The web UI (`docs/BACKLOG.md` Epic 3) is not built
+yet. See [`docs/VISION.md`](docs/VISION.md) for the full plan and
 [`docs/BACKLOG.md`](docs/BACKLOG.md) for the build breakdown.
 
 ## License
