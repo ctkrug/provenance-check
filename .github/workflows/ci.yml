@@ -34,7 +34,10 @@ jobs:
           version: latest
 
       - name: Build
-        run: go build ./...
+        run: go build ./cmd/provenance-check/...
+
+      - name: Build wasm
+        run: GOOS=js GOARCH=wasm go build -o /tmp/main.wasm ./cmd/wasm
 
       - name: Test
         run: go test -race -cover ./...
