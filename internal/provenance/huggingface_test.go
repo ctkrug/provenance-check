@@ -22,7 +22,7 @@ func TestFetchHuggingFaceDatasetParsesLicenseFrontMatter(t *testing.T) {
 	card := "---\nlicense: apache-2.0\ntags:\n  - text\n---\n# Example Dataset\nAn ordinary dataset."
 	withHuggingFaceTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/datasets/example/no-training-dataset/raw/main/README.md" {
-			fmt.Fprint(w, card)
+			_, _ = fmt.Fprint(w, card)
 			return
 		}
 		http.NotFound(w, r)
@@ -46,7 +46,7 @@ func TestFetchHuggingFaceFallsBackToMasterBranch(t *testing.T) {
 		case "/gpt2/raw/main/README.md":
 			http.NotFound(w, r)
 		case "/gpt2/raw/master/README.md":
-			fmt.Fprint(w, "---\nlicense: mit\n---\n# GPT-2")
+			_, _ = fmt.Fprint(w, "---\nlicense: mit\n---\n# GPT-2")
 		default:
 			http.NotFound(w, r)
 		}
@@ -75,7 +75,7 @@ func TestFetchHuggingFaceMissingReadmeIsAnError(t *testing.T) {
 func TestFetchHuggingFaceNoFrontMatterLeavesOverrideEmpty(t *testing.T) {
 	withHuggingFaceTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/example/plain-model/raw/main/README.md" {
-			fmt.Fprint(w, "# Plain Model\nNo front matter here.")
+			_, _ = fmt.Fprint(w, "# Plain Model\nNo front matter here.")
 			return
 		}
 		http.NotFound(w, r)

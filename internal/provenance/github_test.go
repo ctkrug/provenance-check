@@ -28,11 +28,11 @@ func TestFetchGitHubResolvesDefaultBranchAndFiles(t *testing.T) {
 	withGitHubTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case r.URL.Path == "/repos/example/repo":
-			fmt.Fprint(w, `{"default_branch":"trunk"}`)
+			_, _ = fmt.Fprint(w, `{"default_branch":"trunk"}`)
 		case r.URL.Path == "/example/repo/trunk/LICENSE":
-			fmt.Fprint(w, mitText)
+			_, _ = fmt.Fprint(w, mitText)
 		case r.URL.Path == "/example/repo/trunk/README.md":
-			fmt.Fprint(w, "# Example\nAn ordinary project.")
+			_, _ = fmt.Fprint(w, "# Example\nAn ordinary project.")
 		default:
 			http.NotFound(w, r)
 		}
@@ -57,9 +57,9 @@ func TestFetchGitHubTriesAlternateLicenseFileNames(t *testing.T) {
 	withGitHubTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case r.URL.Path == "/repos/example/repo":
-			fmt.Fprint(w, `{"default_branch":"main"}`)
+			_, _ = fmt.Fprint(w, `{"default_branch":"main"}`)
 		case r.URL.Path == "/example/repo/main/LICENSE.md":
-			fmt.Fprint(w, apache2Text)
+			_, _ = fmt.Fprint(w, apache2Text)
 		default:
 			http.NotFound(w, r)
 		}
@@ -77,7 +77,7 @@ func TestFetchGitHubTriesAlternateLicenseFileNames(t *testing.T) {
 func TestFetchGitHubMissingLicenseAndReadmeIsNotAnError(t *testing.T) {
 	withGitHubTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/repos/example/repo" {
-			fmt.Fprint(w, `{"default_branch":"main"}`)
+			_, _ = fmt.Fprint(w, `{"default_branch":"main"}`)
 			return
 		}
 		http.NotFound(w, r)

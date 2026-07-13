@@ -43,11 +43,11 @@ func TestCheckEndToEndGitHubClearVerdict(t *testing.T) {
 	withCombinedTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/repos/example/permissive-repo":
-			fmt.Fprint(w, `{"default_branch":"main"}`)
+			_, _ = fmt.Fprint(w, `{"default_branch":"main"}`)
 		case "/example/permissive-repo/main/LICENSE":
-			fmt.Fprint(w, mitText)
+			_, _ = fmt.Fprint(w, mitText)
 		case "/example/permissive-repo/main/README.md":
-			fmt.Fprint(w, "# Permissive Repo\nNothing unusual here.")
+			_, _ = fmt.Fprint(w, "# Permissive Repo\nNothing unusual here.")
 		default:
 			http.NotFound(w, r)
 		}
@@ -72,9 +72,9 @@ func TestCheckEndToEndGitHubRestrictedVerdict(t *testing.T) {
 	withCombinedTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/repos/example/restricted-dataset":
-			fmt.Fprint(w, `{"default_branch":"main"}`)
+			_, _ = fmt.Fprint(w, `{"default_branch":"main"}`)
 		case "/example/restricted-dataset/main/README.md":
-			fmt.Fprint(w, "You are not permitted to use this dataset for AI training purposes.")
+			_, _ = fmt.Fprint(w, "You are not permitted to use this dataset for AI training purposes.")
 		default:
 			http.NotFound(w, r)
 		}
@@ -95,7 +95,7 @@ func TestCheckEndToEndGitHubRestrictedVerdict(t *testing.T) {
 func TestCheckEndToEndHuggingFaceDataset(t *testing.T) {
 	withCombinedTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/datasets/example/no-training-dataset/raw/main/README.md" {
-			fmt.Fprint(w, "---\nlicense: cc-by-nc-4.0\n---\n# Example Dataset")
+			_, _ = fmt.Fprint(w, "---\nlicense: cc-by-nc-4.0\n---\n# Example Dataset")
 			return
 		}
 		http.NotFound(w, r)

@@ -11,9 +11,9 @@ func TestBatchCheckPreservesOrderAndIsolatesErrors(t *testing.T) {
 	withCombinedTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/repos/example/good-repo":
-			fmt.Fprint(w, `{"default_branch":"main"}`)
+			_, _ = fmt.Fprint(w, `{"default_branch":"main"}`)
 		case "/example/good-repo/main/LICENSE":
-			fmt.Fprint(w, mitText)
+			_, _ = fmt.Fprint(w, mitText)
 		default:
 			http.NotFound(w, r)
 		}
@@ -51,11 +51,11 @@ func TestBatchCheckRunsConcurrently(t *testing.T) {
 		time.Sleep(delay)
 		switch r.URL.Path {
 		case "/repos/example/slow-repo":
-			fmt.Fprint(w, `{"default_branch":"main"}`)
+			_, _ = fmt.Fprint(w, `{"default_branch":"main"}`)
 		case "/example/slow-repo/main/LICENSE":
-			fmt.Fprint(w, mitText)
+			_, _ = fmt.Fprint(w, mitText)
 		case "/example/slow-repo/main/README.md":
-			fmt.Fprint(w, "# Slow Repo")
+			_, _ = fmt.Fprint(w, "# Slow Repo")
 		default:
 			http.NotFound(w, r)
 		}
