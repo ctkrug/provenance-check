@@ -51,8 +51,11 @@ caused it and which file it came from.
   — it invites blind trust. The exact clause and which file it came from is always shown.
 - **Static, deployable front end.** The web UI builds to a single static directory with
   relative asset paths, so it can be hosted at a subpath (`apps.charliekrug.com/provenance-check`)
-  with no server of its own; it calls the same classification logic compiled to run client-side
-  or via a small stateless endpoint (decided in BUILD once the fetch/CORS approach is settled).
+  with no server of its own. Decided in BUILD: `internal/provenance` compiles straight to
+  WebAssembly and runs client-side — GitHub's and Hugging Face's APIs both send permissive
+  CORS headers (`raw.githubusercontent.com`/`api.github.com` send `Access-Control-Allow-Origin:
+  *`; `huggingface.co` reflects the request's `Origin`), so the browser can fetch LICENSE/README
+  content directly with no proxy and no server-side component at all.
 - **Speed is a feature.** The wow moment is five URLs resolving to badges within a couple of
   seconds — that means concurrent fetches and no unnecessary round trips, not just correct
   parsing.
