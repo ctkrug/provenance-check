@@ -1,5 +1,8 @@
 # Provenance Check
 
+[![CI](https://github.com/ctkrug/provenance-check/actions/workflows/ci.yml/badge.svg)](https://github.com/ctkrug/provenance-check/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Paste a list of dataset or repo URLs you're about to train on. Get a plain-English flag on
 any license that restricts AI/ML training use — in seconds, before you commit compute to it.
 
