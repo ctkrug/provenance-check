@@ -32,7 +32,8 @@ Paste GitHub and Hugging Face URLs (one per line). For each one, Provenance Chec
 ## Planned features
 
 - [x] CLI: `provenance-check <url> [<url> ...]` — prints one line per URL, concurrently checked.
-- [ ] Web UI: paste a list, get live rows with badges as each URL resolves.
+- [x] Web UI: paste a list, get live exhibit cards with badges as each URL resolves — runs
+      entirely in the browser (the engine compiles to WebAssembly; no backend server).
 - [x] SPDX identifier detection from `LICENSE` file text (MIT, Apache-2.0, BSD-2/3-Clause, ISC,
       MPL-2.0, GPL-3.0, Unlicense, CC-BY-NC variants).
 - [x] Non-standard clause pattern library, versioned and reviewable independently of code.
@@ -68,6 +69,20 @@ unreachable repo, and similar). Only `github.com/<owner>/<repo>` and
 `huggingface.co/<org>/<model>` / `huggingface.co/datasets/<name>` URLs are supported today;
 anything else reports a clear "unsupported source" error instead of a crash or a silent skip.
 
+### Web UI
+
+```sh
+make site                    # builds site/dist/ — the wasm engine + static HTML/CSS/JS
+python3 -m http.server 8080 --directory site/dist   # any static file server works
+```
+
+Open `http://localhost:8080/` and paste up to 50 GitHub/Hugging Face URLs, one per line. The
+classification engine (the same `internal/provenance` package the CLI uses) runs entirely in
+your browser as WebAssembly — no URL you paste is sent anywhere but the source itself. Each
+exhibit card fills in as its own check resolves; clicking a `CAUTION` or `RESTRICTED` card
+expands the quoted clause. `WebAssembly.instantiateStreaming` needs the page served over
+http(s), not opened as a `file://` URL.
+
 ## Stack
 
 Go (stdlib-first: `net/http`, no heavy framework). A static web front end talks to the same
@@ -75,10 +90,10 @@ core parsing package the CLI uses, so the license-clause logic is never duplicat
 
 ## Status
 
-The core engine is functional end-to-end: paste GitHub or Hugging Face URLs, get a verdict,
-license, and quoted clause via the CLI. The web UI (`docs/BACKLOG.md` Epic 3) is not built
-yet. See [`docs/VISION.md`](docs/VISION.md) for the full plan and
-[`docs/BACKLOG.md`](docs/BACKLOG.md) for the build breakdown.
+The core engine is functional end-to-end via both front ends: the CLI and the browser-based
+web UI (`make site`) share the same `internal/provenance` classification logic. See
+[`docs/VISION.md`](docs/VISION.md) for the full plan and [`docs/BACKLOG.md`](docs/BACKLOG.md)
+for the build breakdown.
 
 ## License
 
