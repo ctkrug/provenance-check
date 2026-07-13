@@ -346,3 +346,120 @@ a {
     display: none;
   }
 }
+
+/* ---------- Exhibit grid ---------- */
+
+.grid-wrap {
+  min-height: 60vh;
+}
+
+.exhibit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  align-content: start;
+}
+
+@media (max-width: 768px) {
+  .exhibit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.exhibit-card {
+  background: var(--surface-1);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-paper);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+
+.exhibit-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(42, 36, 28, 0.1), 0 8px 20px rgba(42, 36, 28, 0.12);
+}
+
+.exhibit-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.exhibit-card__index {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.exhibit-card__url {
+  font-size: var(--step--1);
+  word-break: break-all;
+  color: var(--text);
+}
+
+.exhibit-card__meta {
+  margin: 0;
+}
+
+.exhibit-card__meta-row {
+  display: flex;
+  gap: var(--space-1);
+  font-size: var(--step--1);
+}
+
+.exhibit-card__meta-row dt {
+  color: var(--text-muted);
+}
+
+.exhibit-card__meta-row dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.exhibit-card__toggle {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  padding: var(--space-1) 0;
+}
+
+.exhibit-card__toggle:hover {
+  color: var(--accent-support);
+}
+
+.exhibit-card__clause {
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  padding: var(--space-2);
+}
+
+.exhibit-card__clause-source {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-1);
+}
+
+.exhibit-card__clause-text {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: var(--text);
+  border-left: 2px solid var(--accent-support);
+  padding-left: var(--space-2);
+}
