@@ -8,12 +8,14 @@ left.
 
 ```
 cmd/provenance-check/       thin CLI front end
+cmd/wasm/                   thin browser front end — compiles to WebAssembly
 internal/provenance/        the core engine — the single source of truth for classification
+site/                       static HTML/CSS/JS shell for the web UI (source, not build output)
 ```
 
 `internal/provenance` is intentionally the *only* package with classification logic. The CLI
-(and, later, the web UI) are both thin callers of `provenance.Check` / `provenance.BatchCheck`
-— see `docs/VISION.md`'s "one core package, two front ends" design decision.
+and the web UI are both thin callers of `provenance.Check` / `provenance.BatchCheck` — see
+`docs/VISION.md`'s "one core package, two front ends" design decision.
 
 ## Data flow
 
@@ -62,15 +64,57 @@ whole point of keeping the library as data (see `docs/VISION.md`).
   unsupported-host URLs (which fail during `parseSource`, before any HTTP call) to keep CLI
   plumbing tests deterministic without depending on live GitHub/Hugging Face access.
 
+## The web front end (`cmd/wasm/`, `site/`)
+
+`cmd/wasm` compiles `internal/provenance` to WebAssembly and exposes one function to the
+browser: `window.provenanceCheck(url)`, returning a Promise that resolves to a JSON-decoded
+result. It runs entirely client-side — no backend, no proxy:
+
+```
+cmd/wasm/result.go     JSON conversion (provenance.Result -> checkResult); no syscall/js,
+                        so it's a normal package on any GOOS and unit-testable with `go test`.
+cmd/wasm/main.go        //go:build js && wasm — the syscall/js wiring. Registers
+                        provenanceCheck(url) and parks in select{} to keep callbacks alive.
+```
+
+Each call spawns its own goroutine, so pasting N URLs and calling `provenanceCheck` once per
+URL from JS resolves them concurrently — the same one-broken-URL-doesn't-block-the-rest
+guarantee `BatchCheck` gives the CLI, just driven from the JS side instead of `sync.WaitGroup`.
+
+This works from a browser (not from Node — see below) because both GitHub and Hugging Face
+send CORS headers that allow a browser-origin `fetch()`: `raw.githubusercontent.com` and
+`api.github.com` send `Access-Control-Allow-Origin: *`; `huggingface.co` reflects the
+request's `Origin`. Go's `net/http` on `GOOS=js` transparently backs `http.Get` with the
+Fetch API (`net/http/roundtrip_js.go` in the Go stdlib), so `github.go`/`huggingface.go` need
+no browser-specific code at all.
+
+`site/` holds the static shell as source: `index.html`, `style.css`, `app.js`,
+`wasm_exec.js` (copied from `$(go env GOROOT)/misc/wasm/wasm_exec.js` — the Go runtime's JS
+glue for instantiating a wasm module). `app.js` loads the wasm module, then drives the exhibit
+grid: parses the pasted URLs, creates a card per URL in a loading state, and calls
+`provenanceCheck` once per URL, updating each card in place as its own promise resolves.
+
+`make site` builds `site/dist/` — the wasm binary, `wasm_exec.js`, and the static files
+together in one self-contained, relative-path directory (gitignored; not committed). See
+`docs/DESIGN.md` for the exhibit-binder visual direction the CSS implements.
+
+### A Go/wasm gotcha worth knowing
+
+Go's stdlib deliberately disables its Fetch-based transport when it detects it's running
+under Node.js (`jsFetchDisabled` in `net/http/roundtrip_js.go`, for Go's own test suite —
+see go.dev/issue/57613) and falls back to real `net.Dial`, which doesn't work outside a
+browser. **Don't use `node wasm_exec_node.js` to test network behavior** — it will fail with
+a `dial tcp` error that has nothing to do with the actual browser code path. Verify the wasm
+build with a real browser (this project used headless Chromium via Playwright during BUILD).
+
 ## Running it
 
 ```sh
 go build -o bin/provenance-check ./cmd/provenance-check
 go test -race -cover ./...              # or: make test
 ./bin/provenance-check <url> [<url> ...]
+
+make site                               # builds site/dist/ — open site/dist/index.html
+                                         # via a local static server (not file://, since
+                                         # WebAssembly.instantiateStreaming needs http(s))
 ```
-
-## Not yet built
-
-The web UI (`docs/BACKLOG.md` Epic 3) doesn't exist yet — no `site/` directory, no static
-build. The CLI is the only front end today.
