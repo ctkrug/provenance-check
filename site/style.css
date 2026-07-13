@@ -256,6 +256,10 @@ a {
   text-transform: uppercase;
   border-radius: var(--radius);
   padding: var(--space-1) var(--space-3);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1.5px solid transparent;
   cursor: pointer;
   transition: transform 150ms var(--ease-out), box-shadow 150ms var(--ease-out),
@@ -592,13 +596,21 @@ a {
   text-align: center;
   gap: var(--space-2);
   padding: var(--space-8) var(--space-3);
-  min-height: 55vh;
+  min-height: 60vh;
   color: var(--text-muted);
+  border: 1.5px dashed var(--surface-2);
+  border-radius: var(--radius);
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 27px,
+    rgba(110, 99, 83, 0.06) 28px
+  );
 }
 
 .empty-state__illustration {
-  width: 160px;
-  height: 120px;
+  width: 220px;
+  height: 165px;
 }
 
 .empty-state__page {
