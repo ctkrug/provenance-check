@@ -126,6 +126,7 @@ func TestParseHFLicenseVariants(t *testing.T) {
 		wantOK bool
 	}{
 		{"quoted value", "---\nlicense: \"cc-by-nc-4.0\"\n---\nbody", "CC-BY-NC-4.0", true},
+		{"cc-by-nc-nd variant normalizes to canonical casing", "---\nlicense: cc-by-nc-nd-4.0\n---\nbody", "CC-BY-NC-ND-4.0", true},
 		{"unrecognized slug passes through", "---\nlicense: some-custom-license\n---\nbody", "some-custom-license", true},
 		{"no front matter", "# Just a heading\nbody", "", false},
 		{"front matter without license field", "---\ntags:\n  - x\n---\nbody", "", false},
