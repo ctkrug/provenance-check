@@ -125,3 +125,27 @@ func TestScanDocumentsNoMatchesReturnsFalse(t *testing.T) {
 		t.Fatal("expected no match on clean license text")
 	}
 }
+
+// FuzzScanText asserts scanText's core contract against arbitrary document
+// text: it must never panic (the clause library is a fixed regexp set run
+// against attacker-controlled README/LICENSE content, so this is the one
+// place untrusted text meets a matching engine), and whenever it reports a
+// match, the quoted Text must be verbatim substring of the input — the UI
+// renders it as a direct quote, so it can never be synthesized or altered.
+func FuzzScanText(f *testing.F) {
+	f.Add("You are not permitted to use this dataset for AI training purposes.")
+	f.Add("MIT License, no restrictions here.")
+	f.Add("")
+	f.Add(strings.Repeat("not permitted to use this dataset for AI training. ", 5000))
+	f.Add("💩 not permitted to use this dataset for AI training purposes. 中文")
+
+	f.Fuzz(func(t *testing.T, text string) {
+		match, ok := scanText(text, "LICENSE")
+		if !ok {
+			return
+		}
+		if !strings.Contains(text, match.Text) {
+			t.Errorf("scanText(%q) matched Text %q is not a substring of the input", text, match.Text)
+		}
+	})
+}
