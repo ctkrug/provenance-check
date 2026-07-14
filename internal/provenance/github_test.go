@@ -102,3 +102,24 @@ func TestFetchGitHubRepoNotFoundIsAnError(t *testing.T) {
 		t.Fatal("expected an error for a repo the API reports 404 on")
 	}
 }
+
+// A malicious or misconfigured host could serve a gigabytes-large LICENSE
+// response; httpGetOK must cap what it reads rather than buffering the
+// entire body into memory.
+func TestHTTPGetOKCapsResponseBodySize(t *testing.T) {
+	withGitHubTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		chunk := strings.Repeat("a", 1<<20) // 1MiB per write
+		for i := 0; i < 10; i++ {           // 10MiB total, well past any real LICENSE/README
+			_, _ = w.Write([]byte(chunk))
+		}
+	})
+
+	body, ok := httpGetOK(githubRawBase + "/huge-file")
+	if !ok {
+		t.Fatal("expected httpGetOK to succeed (truncated), not fail, on an oversized body")
+	}
+	if len(body) > maxFetchBodyBytes {
+		t.Errorf("body length = %d bytes, want capped at %d", len(body), maxFetchBodyBytes)
+	}
+}
