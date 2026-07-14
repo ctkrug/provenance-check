@@ -25,19 +25,29 @@ func main() {
 		os.Exit(2)
 	}
 
-	exitCode := 0
-	for _, r := range provenance.BatchCheck(urls) {
+	results := provenance.BatchCheck(urls)
+	for _, r := range results {
 		if r.Err != nil {
 			fmt.Fprintf(os.Stderr, "provenance-check: %s: %v\n", r.Result.URL, r.Err)
-			exitCode = 1
 			continue
 		}
 		printResult(r.Result)
-		if r.Result.Verdict == provenance.VerdictRestricted {
-			exitCode = 1
+	}
+	os.Exit(exitCode(results))
+}
+
+// exitCode implements the README's documented contract: non-zero if any URL
+// is restricted or failed to resolve, zero otherwise. Split out from main so
+// it's unit-testable without spawning the built binary (main_test.go only
+// exercises unsupported-host URLs, to stay deterministic without live
+// network access, so it never reaches a real RESTRICTED verdict).
+func exitCode(results []provenance.BatchResult) int {
+	for _, r := range results {
+		if r.Err != nil || r.Result.Verdict == provenance.VerdictRestricted {
+			return 1
 		}
 	}
-	os.Exit(exitCode)
+	return 0
 }
 
 // printResult renders one line per URL with its badge and SPDX license,
