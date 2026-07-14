@@ -79,6 +79,21 @@ func TestClassifyClauseMatchOutranksCCByNCAmbiguity(t *testing.T) {
 	}
 }
 
+func TestClassifyCautionFromLowercaseUnrecognizedCCByNCVariant(t *testing.T) {
+	// "cc-by-nc-nd-4.0" is a real Hugging Face license slug not present in
+	// hfLicenseAliases, so normalizeHFLicenseSlug passes it through verbatim
+	// (lowercase, as HF always writes it). The CC-BY-NC ambiguity heuristic
+	// must still catch it — a case-sensitive prefix check would silently
+	// downgrade a NonCommercial dataset to a false "clear".
+	result := classify(classifyInput{
+		SPDXOverride:  "cc-by-nc-nd-4.0",
+		LicenseSource: "LICENSE",
+	})
+	if result.Verdict != VerdictCaution {
+		t.Errorf("verdict = %q, want caution (unrecognized CC-BY-NC-family slugs are still ambiguous for ML training)", result.Verdict)
+	}
+}
+
 func TestClassifySPDXOverrideTakesPrecedenceOverTextSniffing(t *testing.T) {
 	result := classify(classifyInput{
 		SPDXOverride:  "Apache-2.0",
