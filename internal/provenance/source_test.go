@@ -95,6 +95,41 @@ func TestParseSourceMalformedURL(t *testing.T) {
 	}
 }
 
+// TestParseSourceRejectsControlCharacters covers url.Parse's own error path:
+// a raw control character (e.g. a pasted tab or stray byte) makes url.Parse
+// itself fail, and that must surface as the same clear "unsupported source"
+// error as any other malformed input, not a panic.
+func TestParseSourceRejectsControlCharacters(t *testing.T) {
+	if _, err := parseSource("https://github.com/ow\tner/repo"); err == nil {
+		t.Error("parseSource(url with control character): expected an error, got none")
+	}
+}
+
+// TestParseSourceHuggingFaceDatasetWithNoIdentitySegments covers pasting a
+// Hugging Face "datasets" URL with nothing after it (or only UI-route
+// keywords), which must be unsupported rather than an empty-identity source.
+func TestParseSourceHuggingFaceDatasetWithNoIdentitySegments(t *testing.T) {
+	cases := []string{
+		"https://huggingface.co/datasets",
+		"https://huggingface.co/datasets/",
+		"https://huggingface.co/datasets/tree/main",
+	}
+	for _, raw := range cases {
+		if _, err := parseSource(raw); err == nil {
+			t.Errorf("parseSource(%q): expected an error for an empty dataset identity", raw)
+		}
+	}
+}
+
+// TestParseSourceHuggingFaceModelWithNoIdentitySegments is the same
+// boundary for a model URL (no "datasets/" prefix) whose only path segment
+// is a UI-route keyword.
+func TestParseSourceHuggingFaceModelWithNoIdentitySegments(t *testing.T) {
+	if _, err := parseSource("https://huggingface.co/tree/main"); err == nil {
+		t.Error("parseSource(model URL with only a UI-route keyword): expected an error")
+	}
+}
+
 func TestParseSourceUnsupportedErrorMentionsURL(t *testing.T) {
 	raw := "https://gitlab.com/example/dataset"
 	_, err := parseSource(raw)
