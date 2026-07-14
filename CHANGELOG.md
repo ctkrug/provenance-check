@@ -3,10 +3,18 @@
 All notable changes to this project are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [1.0.0] - 2026-07-14
+
+First public release. The product ships under the name **Provenance** (the repository slug and
+live URL stay `provenance-check`).
 
 ### Added
 
+- Product landing: the web front end now carries the "Provenance" wordmark and favicon, a
+  "View on GitHub" call to action, a below-the-fold explainer and FAQ answering common
+  "can I train on this dataset" questions, search metadata (title, description, OpenGraph),
+  and a portfolio cross-promo link.
+- `docs/launch/devto.md`: launch write-up covering the Go/WASM engine and data-driven clauses.
 - Project scaffold: Go module, CLI entrypoint, and `internal/provenance` core package.
 - CI workflow (gofmt, vet, golangci-lint, build, test).
 - `docs/VISION.md`, `docs/DESIGN.md`, and `docs/BACKLOG.md`.
