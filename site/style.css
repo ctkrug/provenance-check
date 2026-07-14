@@ -218,7 +218,8 @@ a {
 }
 
 .learn__col {
-  max-width: 74ch;
+  max-width: 1080px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -226,11 +227,13 @@ a {
 
 .learn__title {
   font-size: var(--step-3);
+  max-width: 30ch;
 }
 
 .learn__lede {
   font-size: var(--step-1);
   line-height: 1.55;
+  max-width: 68ch;
 }
 
 .learn h2 {
@@ -238,14 +241,24 @@ a {
   color: var(--accent);
 }
 
+.learn__col > h2,
+.learn__col > p {
+  max-width: 68ch;
+}
+
 .learn p {
   line-height: 1.65;
 }
 
 .learn__faq {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
   gap: var(--space-3);
+  align-items: start;
+}
+
+.learn__faq-title {
+  grid-column: 1 / -1;
 }
 
 .faq-item {
