@@ -90,6 +90,34 @@ func TestFetchHuggingFaceNoFrontMatterLeavesOverrideEmpty(t *testing.T) {
 	}
 }
 
+// TestFetchHuggingFaceFetchesSiblingLicenseFile covers the case a card ships
+// an explicit LICENSE file alongside its README — GitHub sources hit this
+// path routinely, but no existing Hugging Face fixture served a LICENSE, so
+// the fetch loop's success branch was untested.
+func TestFetchHuggingFaceFetchesSiblingLicenseFile(t *testing.T) {
+	withHuggingFaceTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/example/with-license/raw/main/README.md":
+			_, _ = fmt.Fprint(w, "# With License\nSee LICENSE.")
+		case "/example/with-license/raw/main/LICENSE":
+			_, _ = fmt.Fprint(w, mitText)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+
+	in, err := fetchHuggingFace(parsedSource{Kind: sourceHuggingFace, Repo: "example/with-license", IsHFDataset: false})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if in.LicenseSource != "LICENSE" {
+		t.Errorf("LicenseSource = %q, want LICENSE", in.LicenseSource)
+	}
+	if !strings.Contains(in.LicenseText, "MIT License") {
+		t.Errorf("LicenseText = %q, want MIT boilerplate", in.LicenseText)
+	}
+}
+
 func TestParseHFLicenseVariants(t *testing.T) {
 	cases := []struct {
 		name   string
@@ -102,6 +130,7 @@ func TestParseHFLicenseVariants(t *testing.T) {
 		{"no front matter", "# Just a heading\nbody", "", false},
 		{"front matter without license field", "---\ntags:\n  - x\n---\nbody", "", false},
 		{"empty license value", "---\nlicense:\n---\nbody", "", false},
+		{"front matter never closes and has no license field", "---\ntags:\n  - x\n  - y", "", false},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
