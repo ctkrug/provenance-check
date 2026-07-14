@@ -144,7 +144,7 @@ a {
 .wordmark__monogram {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 21px;
+  font-size: 26px;
   fill: var(--accent);
   text-anchor: middle;
 }
@@ -152,10 +152,6 @@ a {
 .wordmark__text {
   font-size: var(--step-3);
   letter-spacing: -0.01em;
-}
-
-.wordmark__accent {
-  color: var(--accent-support);
 }
 
 .masthead__tagline {
