@@ -48,8 +48,7 @@ go build -o bin/provenance-check ./cmd/provenance-check
 
 ./bin/provenance-check \
   https://github.com/expressjs/express \
-  https://huggingface.co/gpt2 \
-  https://huggingface.co/datasets/example/no-training-dataset
+  https://huggingface.co/gpt2
 
 # or pipe a list, one URL per line:
 cat urls.txt | ./bin/provenance-check
@@ -58,14 +57,23 @@ cat urls.txt | ./bin/provenance-check
 ```
 CLEAR      MIT              https://github.com/expressjs/express
 CLEAR      MIT              https://huggingface.co/gpt2
+```
+
+A `RESTRICTED` or `CAUTION` result adds an indented line quoting the exact clause and which
+file it came from, e.g.:
+
+```
 RESTRICTED unknown          https://huggingface.co/datasets/example/no-training-dataset
            clause: "not permitted to use this dataset for AI training purposes." (README.md)
 ```
 
-Each result line is `<verdict> <license> <url>`; a `RESTRICTED` or `CAUTION` result is
-followed by an indented line quoting the exact clause and which file it came from. The
-process exits non-zero if any URL is restricted or fails to resolve (unsupported host,
-unreachable repo, and similar). Only `github.com/<owner>/<repo>` and
+(`huggingface.co/datasets/example/no-training-dataset` above is illustrative, not a live
+dataset — swap in any real URL from a project with a non-standard training-restriction clause
+to see this for yourself.)
+
+Each result line is `<verdict> <license> <url>`. The process exits non-zero if any URL is
+restricted or fails to resolve (unsupported host, unreachable repo, and similar). Only
+`github.com/<owner>/<repo>` and
 `huggingface.co/<org>/<model>` / `huggingface.co/datasets/<name>` URLs are supported today;
 anything else reports a clear "unsupported source" error instead of a crash or a silent skip.
 
