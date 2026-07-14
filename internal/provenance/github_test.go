@@ -92,6 +92,17 @@ func TestFetchGitHubMissingLicenseAndReadmeIsNotAnError(t *testing.T) {
 	}
 }
 
+func TestFetchGitHubUnexpectedAPIStatusIsAnError(t *testing.T) {
+	withGitHubTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	_, err := fetchGitHub(parsedSource{Kind: sourceGitHub, Owner: "example", Repo: "repo"})
+	if err == nil {
+		t.Fatal("expected an error when the GitHub API returns a non-200, non-404 status (e.g. rate limited)")
+	}
+}
+
 func TestFetchGitHubRepoNotFoundIsAnError(t *testing.T) {
 	withGitHubTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
