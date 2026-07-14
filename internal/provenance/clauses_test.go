@@ -39,6 +39,20 @@ func TestLoadClausesRejectsMalformedJSON(t *testing.T) {
 	}
 }
 
+// TestMustLoadClausesPanicsOnInvalidData pins mustLoadClauses's documented
+// contract ("the same contract as regexp.MustCompile") directly: it can
+// only ever be exercised at package init against the real, always-valid
+// embedded clauses.json, so call it standalone with deliberately broken
+// data to confirm it panics rather than silently returning a broken state.
+func TestMustLoadClausesPanicsOnInvalidData(t *testing.T) {
+	defer func() {
+		if recover() == nil {
+			t.Fatal("mustLoadClauses(malformed data) did not panic")
+		}
+	}()
+	mustLoadClauses([]byte("not json"))
+}
+
 func TestLoadClausesEmptyArrayIsValid(t *testing.T) {
 	clauses, err := loadClauses([]byte("[]"))
 	if err != nil {
