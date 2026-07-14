@@ -1,10 +1,16 @@
-.PHONY: build test lint run fmt wasm site
+.PHONY: build test test-site lint run fmt wasm site
 
 build:
 	go build -o bin/provenance-check ./cmd/provenance-check
 
 test:
 	go test -race -cover ./...
+
+# test-site runs the pure-logic unit tests for the web UI (site/logic.js) via
+# Node's built-in test runner — no npm install, no dependency, matching the
+# project's minimal-dependency stance.
+test-site:
+	node --test site/*.test.js
 
 lint:
 	gofmt -l .
@@ -27,5 +33,5 @@ wasm:
 # inside site/ is relative so the output works when served from a subpath.
 site: wasm
 	mkdir -p site/dist
-	cp site/index.html site/style.css site/app.js site/dist/
+	cp site/index.html site/style.css site/logic.js site/app.js site/dist/
 	cp "$$(go env GOROOT)/misc/wasm/wasm_exec.js" site/dist/wasm_exec.js

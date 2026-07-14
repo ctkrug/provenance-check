@@ -37,32 +37,9 @@ loadEngine()
 
 checkButton.disabled = true;
 
-const MAX_URLS = 50;
-
-// parseURLs splits the textarea into one URL per non-blank line, capped at
-// MAX_URLS (the backlog's documented batch ceiling).
-function parseURLs(raw) {
-  return raw
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
-    .slice(0, MAX_URLS);
-}
-
-const VERDICT_LABELS = {
-  clear: "CLEAR",
-  caution: "CAUTION",
-  restricted: "RESTRICTED",
-  error: "ERROR",
-};
-
-// stampFontSize shrinks the label to fit the ring as word length grows —
-// "CLEAR" reads comfortably at 9px, "RESTRICTED" needs to go condensed.
-function stampFontSize(label) {
-  if (label.length <= 5) return 9;
-  if (label.length <= 7) return 7.5;
-  return 6;
-}
+// MAX_URLS, parseURLs, VERDICT_LABELS, and stampFontSize are pure logic
+// with no DOM dependency, so they live in logic.js (loaded before this
+// script) where a plain Node test suite can exercise them directly.
 
 // stampSVG builds the rotated double-ring verdict badge described in
 // docs/DESIGN.md. `loading` renders a dashed placeholder ring instead of a
