@@ -38,7 +38,7 @@ never blocks or fails its neighbors, and wall-clock time tracks the slowest sing
 |---|---|
 | `provenance.go` | Public API: `Result`, `Verdict`, `Check`, `BatchCheck`. |
 | `source.go` | Pure URL parsing (`parseSource`) — no network. Classifies a raw URL into a `parsedSource` (GitHub repo, HF dataset, or HF model) or a descriptive "unsupported source" error. |
-| `github.go` | Resolves a repo's actual default branch via the GitHub API, then fetches LICENSE/README from `raw.githubusercontent.com`. A missing file is not an error — that's a legitimate "unknown" outcome. |
+| `github.go` | Resolves a repo's actual default branch via the GitHub API, then fetches LICENSE/README from `raw.githubusercontent.com`. A missing file is not an error — that's a legitimate "unknown" outcome. `httpGetOK` (shared with `huggingface.go`) caps every response body at `maxFetchBodyBytes` (5MiB) so a huge or misbehaving host can't be read entirely into memory. |
 | `huggingface.go` | Fetches a card's README (trying `main` then `master`) and a sibling LICENSE if present. Parses the card's YAML front-matter `license:` field into an SPDX-ish override. |
 | `spdx.go` | `DetectSPDX(text)` — sniffs standard license boilerplate (MIT, Apache-2.0, BSD-2/3-Clause, ISC, MPL-2.0, GPL-3.0, Unlicense, CC-BY-NC variants) via an ordered list of distinguishing phrases. Returns `ok=false` rather than guessing on unrecognized text. |
 | `clauses.json` | The non-standard "no AI training" clause library: reviewable data, not code. Each entry has an id, a verdict (`caution`/`restricted`), a regexp pattern, and a description. |
@@ -88,11 +88,15 @@ request's `Origin`. Go's `net/http` on `GOOS=js` transparently backs `http.Get` 
 Fetch API (`net/http/roundtrip_js.go` in the Go stdlib), so `github.go`/`huggingface.go` need
 no browser-specific code at all.
 
-`site/` holds the static shell as source: `index.html`, `style.css`, `app.js`,
+`site/` holds the static shell as source: `index.html`, `style.css`, `logic.js`, `app.js`,
 `wasm_exec.js` (copied from `$(go env GOROOT)/misc/wasm/wasm_exec.js` — the Go runtime's JS
-glue for instantiating a wasm module). `app.js` loads the wasm module, then drives the exhibit
-grid: parses the pasted URLs, creates a card per URL in a loading state, and calls
-`provenanceCheck` once per URL, updating each card in place as its own promise resolves.
+glue for instantiating a wasm module). `logic.js` holds the DOM-free pieces (`parseURLs`,
+`stampFontSize`, `MAX_URLS`, `VERDICT_LABELS`) as classic-script globals, loaded before
+`app.js`; it also `module.exports`s them when `require`d from Node, so `logic.test.js` can
+unit-test them directly (`node --test site/*.test.js`, wired into CI) without a browser.
+`app.js` loads the wasm module, then drives the exhibit grid: parses the pasted URLs, creates
+a card per URL in a loading state, and calls `provenanceCheck` once per URL, updating each
+card in place as its own promise resolves.
 
 `make site` builds `site/dist/` — the wasm binary, `wasm_exec.js`, and the static files
 together in one self-contained, relative-path directory (gitignored; not committed). See
@@ -117,4 +121,5 @@ go test -race -cover ./...              # or: make test
 make site                               # builds site/dist/ — open site/dist/index.html
                                          # via a local static server (not file://, since
                                          # WebAssembly.instantiateStreaming needs http(s))
+make test-site                          # unit-tests site/logic.js via `node --test`
 ```
