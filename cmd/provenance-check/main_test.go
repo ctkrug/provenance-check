@@ -67,3 +67,21 @@ func TestNoArgsAndNoStdinPrintsUsage(t *testing.T) {
 		t.Errorf("expected usage text, got: %s", out)
 	}
 }
+
+// A pasted line far past bufio.Scanner's default 64KB token limit must not
+// silently discard the rest of stdin — a hostile/garbled paste on one line
+// shouldn't cost the user every other URL in the batch.
+func TestStdinToleratesLineLongerThanDefaultScannerBuffer(t *testing.T) {
+	bin := buildBinary(t)
+	hugeLine := "https://gitlab.com/example/" + strings.Repeat("a", 100000)
+	cmd := exec.Command(bin)
+	cmd.Stdin = strings.NewReader(hugeLine + "\nhttps://gitlab.com/example/after-huge-line\n")
+	out, err := cmd.CombinedOutput()
+	if err == nil {
+		t.Fatal("expected non-zero exit when every URL is unsupported")
+	}
+	text := string(out)
+	if !strings.Contains(text, "after-huge-line") {
+		t.Errorf("expected the URL following an oversized line to still be checked, got: %s", text)
+	}
+}
