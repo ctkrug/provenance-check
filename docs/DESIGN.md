@@ -1,8 +1,12 @@
 # Design
 
+> **Product name:** the tool ships as **Provenance** (the working title was "Provenance
+> Check"). The wordmark, favicon, and headings use "Provenance"; the repository slug and
+> live URL stay `provenance-check`.
+
 ## 1. Aesthetic direction
 
-**Provenance Check is an exhibit binder.** The page reads like a legal exhibit dossier: a
+**Provenance is an exhibit binder.** The page reads like a legal exhibit dossier: a
 parchment page, serif headings set like a brief, and every result rendered as an exhibit
 card stamped with a rotated verdict badge — CLEAR / CAUTION / RESTRICTED — the way a
 courtroom exhibit gets a sticker and a case number. Quoted clause text sits in monospace,
@@ -69,7 +73,7 @@ paste input is secondary chrome, not the hero.
 The **verdict stamp**: a rotated (−8°) circular badge with a double-ring border and
 letterpress-style condensed caps ("CLEAR" / "CAUTION" / "RESTRICTED"), rendered as inline SVG
 so it's crisp at any size and reused as the favicon (a single navy-on-parchment ring monogram
-"PC"). The stamp "hits" each card on resolve with the scale+rotate flourish described above —
+"P"). The stamp "hits" each card on resolve with the scale+rotate flourish described above —
 one memorable, on-brand flourish rather than decorative particles.
 
 ## 5. Interaction & feedback plan (non-game, but interactive)
