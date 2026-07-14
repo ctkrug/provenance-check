@@ -126,6 +126,26 @@ func TestScanDocumentsNoMatchesReturnsFalse(t *testing.T) {
 	}
 }
 
+// TestSeverityRanking pins severity's full ranking contract directly: every
+// clause in the library is caution or restricted, so scanText/scanDocuments
+// never exercise severity's default (0) branch for VerdictClear or an
+// unknown value in practice — test it standalone instead of relying on that
+// indirect coverage.
+func TestSeverityRanking(t *testing.T) {
+	if severity(VerdictRestricted) <= severity(VerdictCaution) {
+		t.Error("restricted must outrank caution")
+	}
+	if severity(VerdictCaution) <= severity(VerdictClear) {
+		t.Error("caution must outrank clear")
+	}
+	if got := severity(VerdictClear); got != 0 {
+		t.Errorf("severity(clear) = %d, want 0", got)
+	}
+	if got := severity(Verdict("bogus")); got != 0 {
+		t.Errorf("severity(unknown verdict) = %d, want 0 (default)", got)
+	}
+}
+
 // FuzzScanText asserts scanText's core contract against arbitrary document
 // text: it must never panic (the clause library is a fixed regexp set run
 // against attacker-controlled README/LICENSE content, so this is the one
