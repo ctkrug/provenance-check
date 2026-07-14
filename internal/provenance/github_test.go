@@ -103,6 +103,28 @@ func TestFetchGitHubRepoNotFoundIsAnError(t *testing.T) {
 	}
 }
 
+func TestFetchGitHubMalformedAPIResponseIsAnError(t *testing.T) {
+	withGitHubTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprint(w, "not json at all {{{")
+	})
+
+	_, err := fetchGitHub(parsedSource{Kind: sourceGitHub, Owner: "example", Repo: "repo"})
+	if err == nil {
+		t.Fatal("expected an error when the GitHub API returns malformed JSON")
+	}
+}
+
+func TestFetchGitHubEmptyDefaultBranchIsAnError(t *testing.T) {
+	withGitHubTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprint(w, `{"default_branch":""}`)
+	})
+
+	_, err := fetchGitHub(parsedSource{Kind: sourceGitHub, Owner: "example", Repo: "repo"})
+	if err == nil {
+		t.Fatal("expected an error when the API response omits a default branch")
+	}
+}
+
 // A malicious or misconfigured host could serve a gigabytes-large LICENSE
 // response; httpGetOK must cap what it reads rather than buffering the
 // entire body into memory.
