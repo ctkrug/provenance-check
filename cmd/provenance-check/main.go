@@ -50,16 +50,25 @@ func printResult(r provenance.Result) {
 	}
 }
 
+// readURLsFromStdin reads one URL per line. It uses bufio.Reader rather than
+// bufio.Scanner because Scanner's default 64KB token limit makes Scan() fail
+// outright on an oversized line, silently discarding every line after it —
+// an unbounded reader tolerates a hostile/garbled paste on one line without
+// losing the rest of the batch.
 func readURLsFromStdin() []string {
 	stat, err := os.Stdin.Stat()
 	if err != nil || (stat.Mode()&os.ModeCharDevice) != 0 {
 		return nil // no piped input
 	}
 	var urls []string
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		if line := scanner.Text(); line != "" {
-			urls = append(urls, line)
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		line, err := reader.ReadString('\n')
+		if trimmed := strings.TrimRight(line, "\r\n"); trimmed != "" {
+			urls = append(urls, trimmed)
+		}
+		if err != nil {
+			break
 		}
 	}
 	return urls
