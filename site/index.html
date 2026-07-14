@@ -64,11 +64,95 @@
               <text x="118" y="83" class="empty-state__stamp-text">?</text>
             </svg>
             <p class="empty-state__title">No exhibits filed yet</p>
-            <p class="empty-state__body">Paste a batch of URLs and press Check — each one opens its own exhibit card here.</p>
+            <p class="empty-state__body">Paste a batch of URLs and press Check. Each one opens its own exhibit card here.</p>
           </div>
         </div>
       </section>
     </main>
+
+    <section class="learn" aria-labelledby="learn-title">
+      <div class="learn__col">
+        <h1 id="learn-title" class="learn__title">Can I use this dataset to train AI?</h1>
+        <p class="learn__lede">
+          Whether you can train an AI or machine learning model on a dataset comes down to its
+          license, and the license is not always the SPDX tag at the top of the repo. Provenance
+          reads the actual LICENSE and README text behind each GitHub or Hugging Face URL you
+          paste and returns a plain answer: clear, caution, or restricted, with the exact clause
+          quoted so you can check it yourself.
+        </p>
+
+        <h2>What a license checker for AI training data looks for</h2>
+        <p>
+          Standard open-source licenses like MIT and Apache 2.0 mostly say nothing about machine
+          learning training one way or the other. The risk sits in the exceptions. A growing
+          number of datasets and model repos add non-standard terms straight to a README or a
+          custom LICENSE file: "not for use in training machine learning models", OpenRAIL-style
+          behavioral restrictions, or a NonCommercial license applied to data in a way that is
+          ambiguous for commercial training. Generic license scanners built for software
+          compliance skip these, because "restricts AI training" is not part of any SPDX
+          taxonomy. Provenance scans for that specific phrasing with a maintained pattern library
+          and flags every hit.
+        </p>
+
+        <h2>How to read the verdict</h2>
+        <p>
+          Each URL resolves to one of three stamps. CLEAR means no training restriction was
+          found. CAUTION means the terms are ambiguous for machine learning, most often a
+          NonCommercial license or a research-only grant. RESTRICTED means an explicit no-training
+          clause was matched, and the card shows the sentence and the file it came from. No
+          verdict is a black box: if Provenance flags a source, it points at the words that
+          caused it.
+        </p>
+
+        <div class="learn__faq">
+          <h2 class="learn__faq-title">Common questions</h2>
+
+          <div class="faq-item">
+            <h3>Can I use this dataset to train AI?</h3>
+            <p>
+              It depends on the dataset's license and any extra terms in its README. If the
+              license is permissive (MIT, Apache 2.0, BSD) and carries no added restriction,
+              training is generally allowed. A NonCommercial or research-only license, or an
+              explicit no-AI-training clause, changes that answer. Paste the URL above to see
+              which case applies.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Does the MIT license allow AI training?</h3>
+            <p>
+              Yes. The MIT license permits use, modification, and distribution with no
+              field-of-use limits, so training a model on MIT-licensed data is allowed as long as
+              you keep the copyright notice. Provenance still scans the README, because some MIT
+              repos bolt on a separate training restriction the license text alone would not
+              reveal.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Does a CC-BY-NC license allow AI training?</h3>
+            <p>
+              Creative Commons NonCommercial licenses allow non-commercial and research training
+              but are ambiguous for commercial machine learning use, since "NonCommercial" is not
+              defined for model training. Provenance flags the CC-BY-NC family as CAUTION rather
+              than guessing.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Does an open-source license mean the data is free to train on?</h3>
+            <p>
+              Not always. An OSI-approved license covers copying and distributing the work, but a
+              dataset published under it can still carry a separate usage note that restricts
+              training. Always read the README as well as the LICENSE, which is exactly the pair
+              Provenance checks for you.
+            </p>
+          </div>
+        </div>
+
+        <a class="learn__cta button button--primary" href="https://github.com/ctkrug/provenance-check">View the source on GitHub</a>
+      </div>
+    </section>
 
     <footer class="site-footer">
       <p>Not legal advice: always confirm with the license source before training. Runs entirely in your browser, so no URL you paste is sent anywhere but the source itself.</p>

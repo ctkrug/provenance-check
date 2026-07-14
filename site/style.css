@@ -209,6 +209,64 @@ a {
   }
 }
 
+/* ---------- Learn / SEO section ---------- */
+
+.learn {
+  border-top: 1px solid var(--surface-2);
+  margin-top: var(--space-4);
+  padding-top: var(--space-6);
+}
+
+.learn__col {
+  max-width: 74ch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.learn__title {
+  font-size: var(--step-3);
+}
+
+.learn__lede {
+  font-size: var(--step-1);
+  line-height: 1.55;
+}
+
+.learn h2 {
+  font-size: var(--step-1);
+  color: var(--accent);
+}
+
+.learn p {
+  line-height: 1.65;
+}
+
+.learn__faq {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.faq-item {
+  background: var(--surface-1);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-paper);
+  border-left: 3px solid var(--accent-support);
+  padding: var(--space-3);
+}
+
+.faq-item h3 {
+  font-size: var(--step-1);
+  margin-bottom: var(--space-1);
+}
+
+.learn__cta {
+  align-self: flex-start;
+  text-decoration: none;
+  margin-top: var(--space-2);
+}
+
 /* ---------- Panel (paste form) ---------- */
 
 .panel {
