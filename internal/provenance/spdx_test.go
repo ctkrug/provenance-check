@@ -79,6 +79,26 @@ func TestDetectSPDXUnknownTextReturnsExplicitUnknown(t *testing.T) {
 	}
 }
 
+// TestDetectSPDXExcludesBSD2FromNonAttributableText covers the BSD-2-Clause
+// signature's Excludes clause on its own: text with both "redistributions"
+// phrases but no "endorse or promote products" fails the BSD-3-Clause check,
+// but must NOT then be misidentified as BSD-2-Clause just because it also
+// contains "neither the name" (an incomplete/mangled BSD-3 variant, not a
+// real BSD-2 grant — BSD-2 never has a "neither the name" clause at all).
+func TestDetectSPDXExcludesBSD2FromNonAttributableText(t *testing.T) {
+	text := `Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice.
+2. Redistributions in binary form must reproduce the above copyright notice.
+3. Neither the name of the copyright holder may be used to endorse this
+   software without specific prior written permission.
+`
+	if id, ok := DetectSPDX(text); ok {
+		t.Errorf("DetectSPDX(mangled BSD-3 fragment) = (%q, true), want ok=false", id)
+	}
+}
+
 func TestDetectSPDXEmptyTextReturnsUnknown(t *testing.T) {
 	if _, ok := DetectSPDX(""); ok {
 		t.Fatal("DetectSPDX(\"\") ok = true, want false")
