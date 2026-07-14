@@ -195,8 +195,13 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
+  // clearButton is disabled for the same reason checkButton/urlsField are:
+  // clicking Clear mid-batch would reset the grid and status line while
+  // in-flight checks are still resolving, and their completions would then
+  // clobber the just-cleared status line with stale "N of M resolved" text.
   checkButton.disabled = true;
   urlsField.readOnly = true;
+  clearButton.disabled = true;
   try {
     await runBatch(urls);
     if (lineCount > MAX_URLS) {
@@ -205,6 +210,7 @@ form.addEventListener("submit", async (event) => {
   } finally {
     checkButton.disabled = false;
     urlsField.readOnly = false;
+    clearButton.disabled = false;
   }
 });
 

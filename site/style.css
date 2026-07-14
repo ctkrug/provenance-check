@@ -303,6 +303,14 @@ a {
   transform: translateY(1px);
 }
 
+.button--ghost:disabled {
+  color: var(--text-muted);
+  border-color: var(--surface-2);
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .status-line {
   margin-top: var(--space-2);
   font-size: var(--step--1);
