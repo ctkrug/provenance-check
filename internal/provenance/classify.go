@@ -56,7 +56,7 @@ func classify(in classifyInput) Result {
 		}
 	}
 
-	if strings.HasPrefix(spdxID, "CC-BY-NC") {
+	if strings.HasPrefix(strings.ToUpper(spdxID), "CC-BY-NC") {
 		return Result{
 			Verdict: VerdictCaution,
 			License: license,
