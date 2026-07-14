@@ -17,6 +17,10 @@ jobs:
           go-version: "1.22"
           cache: true
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Verify gofmt
         run: |
           fmt_out="$(gofmt -l .)"
@@ -41,3 +45,6 @@ jobs:
 
       - name: Test
         run: go test -race -cover ./...
+
+      - name: Test site logic
+        run: node --test site/*.test.js
