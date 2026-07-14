@@ -160,6 +160,12 @@ a {
   max-width: 46ch;
 }
 
+.masthead__github {
+  margin-left: auto;
+  align-self: center;
+  text-decoration: none;
+}
+
 .layout {
   flex: 1;
   display: grid;
@@ -174,6 +180,23 @@ a {
   color: var(--text-muted);
   font-size: var(--step--1);
   max-width: 70ch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.site-footer__cross-promo {
+  color: var(--text-muted);
+}
+
+.site-footer__cross-promo a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-support);
+}
+
+.site-footer__cross-promo a:hover {
+  color: #16304f;
 }
 
 @media (max-width: 768px) {
