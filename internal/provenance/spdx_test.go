@@ -1,6 +1,9 @@
 package provenance
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 const mitText = `MIT License
 
@@ -90,4 +93,33 @@ func TestDetectSPDXIsCaseInsensitive(t *testing.T) {
 	if !ok || got != "MIT" {
 		t.Errorf("DetectSPDX(lowercase MIT) = (%q, %v), want (MIT, true)", got, ok)
 	}
+}
+
+// FuzzDetectSPDX asserts the "explicit unknown, never a wrong guess"
+// contract holds for arbitrary input, not just the hand-picked fixtures
+// above: DetectSPDX must never panic, and whenever it reports ok=true the
+// identifier must be one from the known signature list — never a value
+// conjured from the input text itself.
+func FuzzDetectSPDX(f *testing.F) {
+	f.Add(mitText)
+	f.Add(apache2Text)
+	f.Add("")
+	f.Add("   \n\t  ")
+	f.Add(strings.Repeat("license ", 10000))
+	f.Add("💩 not a license 中文 \x00\x01")
+
+	known := map[string]bool{}
+	for _, sig := range spdxSignatures {
+		known[sig.ID] = true
+	}
+
+	f.Fuzz(func(t *testing.T, text string) {
+		id, ok := DetectSPDX(text)
+		if ok && !known[id] {
+			t.Errorf("DetectSPDX(%q) returned unknown id %q", text, id)
+		}
+		if !ok && id != "" {
+			t.Errorf("DetectSPDX(%q) = (%q, false), want empty id when ok=false", text, id)
+		}
+	})
 }
