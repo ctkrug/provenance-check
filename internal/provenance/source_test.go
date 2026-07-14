@@ -105,3 +105,41 @@ func TestParseSourceUnsupportedErrorMentionsURL(t *testing.T) {
 		t.Errorf("error %q does not mention the offending URL %q", got, raw)
 	}
 }
+
+// FuzzParseSource asserts parseSource's core promise for arbitrary pasted
+// text, not just the hand-picked fixtures above: it must never panic, and
+// it must never return ok with an empty Owner/Repo identity (a "successful"
+// parse with nothing to fetch would just surface as a confusing empty-body
+// result three layers downstream instead of a clear "unsupported source").
+func FuzzParseSource(f *testing.F) {
+	seeds := []string{
+		"https://github.com/example/dataset",
+		"https://huggingface.co/datasets/example/name",
+		"https://huggingface.co/gpt2",
+		"not a url at all",
+		"",
+		"github.com/missing-scheme/repo",
+		"https://github.com/../../etc/passwd",
+		"https://github.com/%2e%2e/%2e%2e",
+		"ftp://github.com/owner/repo",
+		"https://github.com:99999/owner/repo",
+		"https://xn--n3h.github.com/owner/repo",
+		"https://github.com/💩/repo",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(t *testing.T, raw string) {
+		src, err := parseSource(raw)
+		if err != nil {
+			return
+		}
+		if src.Kind == sourceGitHub && (src.Owner == "" || src.Repo == "") {
+			t.Errorf("parseSource(%q) returned ok github source with empty identity: %+v", raw, src)
+		}
+		if src.Kind == sourceHuggingFace && src.Repo == "" {
+			t.Errorf("parseSource(%q) returned ok huggingface source with empty identity: %+v", raw, src)
+		}
+	})
+}
