@@ -19,6 +19,14 @@ var (
 // across the concurrent fetches BatchCheck issues.
 var httpClient = &http.Client{Timeout: 10 * time.Second}
 
+// maxFetchBodyBytes caps how much of a single LICENSE/README response
+// httpGetOK will buffer. Real license and README files are a few KB to a
+// few hundred KB at most; 5MiB is generous headroom while still bounding
+// memory against a malicious or misconfigured host serving something huge —
+// this engine also runs client-side in a browser tab via WASM, where an
+// unbounded read is a worse failure mode than on a CLI.
+const maxFetchBodyBytes = 5 * 1024 * 1024
+
 // licenseFileNames and readmeFileNames are tried in order; the first one
 // that resolves with HTTP 200 wins. Order reflects real-world frequency.
 var (
@@ -98,7 +106,7 @@ func httpGetOK(url string) (string, bool) {
 	if resp.StatusCode != http.StatusOK {
 		return "", false
 	}
-	body, err := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxFetchBodyBytes))
 	if err != nil {
 		return "", false
 	}
